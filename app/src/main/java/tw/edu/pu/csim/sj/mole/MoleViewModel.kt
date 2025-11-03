@@ -28,7 +28,9 @@ class MoleViewModel : ViewModel(){
 
 
     fun incrementCounter() {
-        counter++
+        if (stay < 60) {
+            counter++
+        }
     }
 init {
     // 在 ViewModel 初始化時啟動一個協程來自動增加計數器
@@ -37,9 +39,10 @@ init {
 
 private fun startCounting() {
     viewModelScope.launch {
-        while (true) { // 無限循環，每秒增加一次
+        while  (stay < 60) { // 無限循環，每秒增加一次
             delay(1000L)
             stay++ // 計數器加 1，這會自動觸發 UI 更新
+            if (stay < 60)
             moveMole()
         }
     }
