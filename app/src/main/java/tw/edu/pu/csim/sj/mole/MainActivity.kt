@@ -21,6 +21,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
@@ -45,9 +47,19 @@ fun MoleScreen(  moleViewModel: MoleViewModel = viewModel()) {
     //var counter by rememberSaveable{ mutableLongStateOf(0) }
     val counter = moleViewModel.counter
     val stay = moleViewModel.stay
+    // DP-to-pixel轉換
+    val density = LocalDensity.current
+
+    // 地鼠Dp轉Px
+    val moleSizeDp = 150.dp
+    val moleSizePx = with(density) { moleSizeDp.roundToPx() }
+
     Box (
-        modifier = Modifier.fillMaxSize(),
-        Alignment.Center
+        modifier = Modifier.fillMaxSize()
+            .onSizeChanged { intSize ->  // 用來獲取全螢幕尺寸px
+        moleViewModel.getArea(intSize, moleSizePx) },
+
+    Alignment.Center
     ) {
         Text("分數: $counter \n時間: $stay")
 
@@ -56,8 +68,9 @@ fun MoleScreen(  moleViewModel: MoleViewModel = viewModel()) {
         painter = painterResource(id = R.drawable.mole),
         contentDescription = "地鼠",
         modifier = Modifier
-            .offset { IntOffset(50, 200) }
-            .size(150.dp)
+            .offset { IntOffset(moleViewModel.offsetX, moleViewModel.offsetY) }
+            .size(moleSizeDp)
+
             .clickable { moleViewModel.incrementCounter() }
     )
 
